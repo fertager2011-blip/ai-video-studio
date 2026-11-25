@@ -22,7 +22,8 @@ function projectCard(p) {
   return `<article class="project-card">
     <div class="project-card-info">
       <strong>${escapeHtml(p.name || "Без названия")}</strong>
-      <small>${escapeHtml(p.duration || "Длительность не определена")} · ${escapeHtml(p.created || "")}</small>
+      <small>${escapeHtml(p.created || "")}</small>
+      <small>${escapeHtml(p.outputFormat || "9:16")} · ${escapeHtml(p.outputResolution || "1080p")} · ${escapeHtml(String(p.outputFps || 30))} FPS</small>
       <span class="pill">${escapeHtml(p.status || "Черновик")}</span>
     </div>
     <button class="delete-project-btn" type="button" data-delete-project="${escapeHtml(p.id)}" aria-label="Удалить проект">Удалить</button>
@@ -120,7 +121,10 @@ $("analyzeBtn").addEventListener("click", () => {
     name,
     instruction,
     fileName: selectedFile.name,
-    duration: "Длительность будет проверена сервером",
+    duration: "Как в исходном видео",
+    outputFormat: $("outputFormat").value,
+    outputResolution: $("outputResolution").value,
+    outputFps: Number($("outputFps").value),
     created: new Date().toLocaleDateString("ru-RU"),
     status: "Черновик · план ожидает подтверждения"
   };
