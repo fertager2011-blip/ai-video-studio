@@ -4,6 +4,8 @@ let selectedFile = null;
 let currentProject = null;
 let projects = JSON.parse(localStorage.getItem("aivs_projects") || "[]");
 let previewUrl = null;
+let selectedDurationSeconds = null;
+let durationMetadataPromise = Promise.resolve(null);
 
 function show(name) {
   screens.forEach(s => $(s + "Screen").classList.toggle("active", s === name));
@@ -24,6 +26,7 @@ function projectCard(p) {
       <strong>${escapeHtml(p.name || "Без названия")}</strong>
       <small>${escapeHtml(p.created || "")}</small>
       <small>${escapeHtml(p.outputFormat || "9:16")} · ${escapeHtml(p.outputResolution || "1080p")} · ${escapeHtml(String(p.outputFps || 30))} FPS</small>
+      ${Number.isFinite(Number(p.durationSeconds)) ? `<small>Длительность: ${escapeHtml(formatDuration(Number(p.durationSeconds)))}</small>` : ""}
       <span class="pill">${escapeHtml(p.status || "Черновик")}</span>
     </div>
     <button class="delete-project-btn" type="button" data-delete-project="${escapeHtml(p.id)}" aria-label="Удалить проект">Удалить</button>
@@ -51,6 +54,16 @@ function renderProjects() {
     : emptyProjects();
 
   $("viewAllProjectsBtn").hidden = projects.length === 0;
+}
+
+function formatDuration(totalSeconds) {
+  const seconds = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainder = seconds % 60;
+  return hours > 0
+    ? `${hours} ч ${String(minutes).padStart(2, "0")} мин ${String(remainder).padStart(2, "0")} сек`
+    : `${minutes} мин ${String(remainder).padStart(2, "0")} сек`;
 }
 
 function escapeHtml(value) {
@@ -88,22 +101,56 @@ document.querySelectorAll("[data-go]").forEach(button =>
 
 $("videoFile").addEventListener("change", () => {
   selectedFile = $("videoFile").files[0] || null;
+  selectedDurationSeconds = null;
   $("fileLabel").textContent = selectedFile ? selectedFile.name : "Выбрать видео из галереи";
   const video = $("videoPreview");
-
+  const durationInfo = $("durationInfo");
   if (previewUrl) URL.revokeObjectURL(previewUrl);
 
-  if (selectedFile) {
-    previewUrl = URL.createObjectURL(selectedFile);
-    video.src = previewUrl;
-    video.hidden = false;
-  } else {
+  if (!selectedFile) {
+    video.pause();
     video.hidden = true;
     video.removeAttribute("src");
+    durationInfo.textContent = "Длительность появится после выбора видео.";
+    durationMetadataPromise = Promise.resolve(null);
+    return;
   }
+
+  const fileAtSelection = selectedFile;
+  previewUrl = URL.createObjectURL(selectedFile);
+  video.preload = "metadata";
+  video.src = previewUrl;
+  video.hidden = false;
+  durationInfo.textContent = "Определяем длительность видео…";
+
+  durationMetadataPromise = new Promise(resolve => {
+    const cleanup = () => {
+      video.removeEventListener("loadedmetadata", onLoaded);
+      video.removeEventListener("error", onError);
+    };
+    const onLoaded = () => {
+      cleanup();
+      const duration = video.duration;
+      if (selectedFile !== fileAtSelection || !Number.isFinite(duration) || duration <= 0) {
+        resolve(null);
+        return;
+      }
+      selectedDurationSeconds = duration;
+      durationInfo.textContent = `Длительность исходного видео: ${formatDuration(duration)}`;
+      resolve(duration);
+    };
+    const onError = () => {
+      cleanup();
+      if (selectedFile === fileAtSelection) durationInfo.textContent = "Не удалось прочитать длительность этого видео. Попробуйте другой файл.";
+      resolve(null);
+    };
+    video.addEventListener("loadedmetadata", onLoaded, { once: true });
+    video.addEventListener("error", onError, { once: true });
+    video.load();
+  });
 });
 
-$("analyzeBtn").addEventListener("click", () => {
+$("analyzeBtn").addEventListener("click", async () => {
   if (!selectedFile) {
     alert("Сначала выберите видео из галереи.");
     return;
@@ -115,13 +162,23 @@ $("analyzeBtn").addEventListener("click", () => {
     return;
   }
 
+  if (selectedDurationSeconds === null) {
+    $("durationInfo").textContent = "Ожидаем данные о длительности видео…";
+    await durationMetadataPromise;
+  }
+  if (selectedDurationSeconds === null) {
+    alert("Не удалось определить длительность видео. Выберите другой видеофайл и дождитесь её отображения.");
+    return;
+  }
+
   const name = selectedFile.name.replace(/\.[^.]+$/, "") || "Новый проект";
   currentProject = {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
     name,
     instruction,
     fileName: selectedFile.name,
-    duration: "Как в исходном видео",
+    duration: formatDuration(selectedDurationSeconds),
+    durationSeconds: selectedDurationSeconds,
     outputFormat: $("outputFormat").value,
     outputResolution: $("outputResolution").value,
     outputFps: Number($("outputFps").value),
