@@ -5,6 +5,8 @@ let currentProject = null;
 let projects = JSON.parse(localStorage.getItem("aivs_projects") || "[]");
 let previewUrl = null;
 let selectedDurationSeconds = null;
+const MAX_FILE_BYTES = 500 * 1024 * 1024;
+const ALLOWED_VIDEO_EXTENSIONS = ["mp4", "mov", "m4v", "webm"];
 let durationMetadataPromise = Promise.resolve(null);
 
 function show(name) {
@@ -55,6 +57,17 @@ function renderProjects() {
 
   $("viewAllProjectsBtn").hidden = projects.length === 0;
 }
+
+function formatFileSize(bytes) {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+function getFileExtension(fileName) {
+  const match = String(fileName).toLowerCase().match(/\\.([a-z0-9]+)$/);
+  return match ? match[1] : "";
+}
+
 
 function formatDuration(totalSeconds) {
   const seconds = Math.max(0, Math.floor(totalSeconds));
