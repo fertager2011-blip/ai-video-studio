@@ -118,22 +118,44 @@ $("videoFile").addEventListener("change", () => {
   $("fileLabel").textContent = selectedFile ? selectedFile.name : "Выбрать видео из галереи";
   const video = $("videoPreview");
   const durationInfo = $("durationInfo");
+  const fileInfo = $("fileInfo");
   if (previewUrl) URL.revokeObjectURL(previewUrl);
 
   if (!selectedFile) {
-    video.pause();
-    video.hidden = true;
-    video.removeAttribute("src");
+    video.pause(); video.hidden = true; video.removeAttribute("src");
+    fileInfo.hidden = true; fileInfo.textContent = "";
     durationInfo.textContent = "Длительность появится после выбора видео.";
     durationMetadataPromise = Promise.resolve(null);
     return;
   }
 
   const fileAtSelection = selectedFile;
+  const extension = getFileExtension(selectedFile.name);
+  if (!ALLOWED_VIDEO_EXTENSIONS.includes(extension)) {
+    alert("Формат не поддерживается. Выберите MP4, MOV, M4V или WEBM.");
+    selectedFile = null; $("videoFile").value = "";
+    $("fileLabel").textContent = "Выбрать видео из галереи";
+    fileInfo.hidden = true;
+    video.pause(); video.hidden = true; video.removeAttribute("src");
+    durationInfo.textContent = "Выберите видео в поддерживаемом формате.";
+    durationMetadataPromise = Promise.resolve(null);
+    return;
+  }
+  if (selectedFile.size > MAX_FILE_BYTES) {
+    alert("Файл слишком большой. Максимальный размер — 500 MB.");
+    selectedFile = null; $("videoFile").value = "";
+    $("fileLabel").textContent = "Выбрать видео из галереи";
+    fileInfo.hidden = true;
+    video.pause(); video.hidden = true; video.removeAttribute("src");
+    durationInfo.textContent = "Выберите видео размером до 500 MB.";
+    durationMetadataPromise = Promise.resolve(null);
+    return;
+  }
+
+  fileInfo.innerHTML = `<strong>Файл:</strong> ${escapeHtml(selectedFile.name)}<br><strong>Размер:</strong> ${formatFileSize(selectedFile.size)}<br><strong>Формат:</strong> ${extension.toUpperCase()}`;
+  fileInfo.hidden = false;
   previewUrl = URL.createObjectURL(selectedFile);
-  video.preload = "metadata";
-  video.src = previewUrl;
-  video.hidden = false;
+  video.preload = "metadata"; video.src = previewUrl; video.hidden = false;
   durationInfo.textContent = "Определяем длительность видео…";
 
   durationMetadataPromise = new Promise(resolve => {
@@ -144,10 +166,7 @@ $("videoFile").addEventListener("change", () => {
     const onLoaded = () => {
       cleanup();
       const duration = video.duration;
-      if (selectedFile !== fileAtSelection || !Number.isFinite(duration) || duration <= 0) {
-        resolve(null);
-        return;
-      }
+      if (selectedFile !== fileAtSelection || !Number.isFinite(duration) || duration <= 0) { resolve(null); return; }
       selectedDurationSeconds = duration;
       durationInfo.textContent = `Длительность исходного видео: ${formatDuration(duration)}`;
       resolve(duration);
