@@ -55,7 +55,8 @@
         <span class="muted small">MP4, MOV и другие форматы, поддерживаемые браузером</span>
       </label>
       <input id="videoFile" type="file" accept="video/*" hidden>
-      <video id="videoPreview" class="video-preview" controls playsinline hidden></video>
+      <video id="videoPreview" class="video-preview" controls playsinline preload="metadata" hidden></video>
+      <p id="durationInfo" class="muted small" aria-live="polite">Длительность появится после выбора видео.</p>
       <div class="field">
         <label for="instruction">Описание изменений</label>
         <textarea id="instruction" rows="5" placeholder="Например: замени скатерть на светлую мраморную поверхность, фон сделай современной кухней. Руки, продукты и посуду оставь без изменений."></textarea>
@@ -81,7 +82,7 @@
           <option value="30" selected>30 FPS — рекомендуемое</option>
           <option value="60">60 FPS — более плавное движение</option>
         </select>
-        <div class="notice">Длительность отдельно выбирать не нужно: приложение определит её по исходному ролику и сохранит полностью. Если понадобится обрезка, добавим отдельный инструмент монтажа.</div>
+        <div class="notice">Приложение автоматически определит длительность исходного ролика и сохранит её в проекте. Обрезка видео пока не выполняется.</div>
       </div>
       <div class="notice">Оригинал должен оставаться неизменным. В рабочей версии на сервер будет отправляться отдельная копия.</div>
       <button class="primary full" id="analyzeBtn">Продолжить к плану обработки</button>
