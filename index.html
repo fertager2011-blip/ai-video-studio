@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="AI Video Studio — управление обработкой кулинарных видео">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <title>AI Video Studio</title>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark">AI</div>
+    <div class="brand-copy"><strong>Video Studio</strong><span>Рабочее пространство</span></div>
+    <span class="connection"><i></i> Интерфейс демо</span>
+  </header>
+
+  <main class="shell">
+    <section id="homeScreen" class="screen active">
+      <div class="hero">
+        <div><p class="eyebrow">ВАША СТУДИЯ</p><h1>Мои видео</h1><p class="muted">Загружайте ролики, описывайте изменения и согласовывайте результат с ИИ.</p></div>
+        <div class="hero-icon">▶</div>
+      </div>
+      <div class="stats">
+        <article class="stat"><span>Проекты</span><strong id="projectCount">0</strong></article>
+        <article class="stat"><span>Готовые видео</span><strong id="readyCount">0</strong></article>
+      </div>
+      <button class="primary full" id="newProjectBtn">＋ Создать новое видео</button>
+      <div class="section-heading"><h2>Последние проекты</h2><span class="muted small">На этом устройстве</span></div>
+      <div id="projectList" class="project-list">
+        <div class="empty"><div class="empty-icon">▧</div><strong>Пока нет проектов</strong><p>Создайте первый проект, выбрав видео из галереи.</p></div>
+      </div>
+      <div class="notice"><strong>Важно:</strong> сейчас это первый интерфейсный прототип. Видео не отправляется на сервер и не обрабатывается.</div>
+    </section>
+
+    <section id="createScreen" class="screen">
+      <button class="back" data-go="home">← Мои видео</button>
+      <p class="eyebrow">НОВЫЙ ПРОЕКТ</p>
+      <h1>Что изменим в видео?</h1>
+      <p class="muted">Выберите ролик и опишите результат обычными словами.</p>
+      <label class="upload-zone" for="videoFile">
+        <span class="upload-symbol">＋</span>
+        <strong id="fileLabel">Выбрать видео из галереи</strong>
+        <span class="muted small">MP4, MOV и другие форматы, поддерживаемые браузером</span>
+      </label>
+      <input id="videoFile" type="file" accept="video/*" hidden>
+      <video id="videoPreview" class="video-preview" controls playsinline hidden></video>
+      <div class="field">
+        <label for="instruction">Описание изменений</label>
+        <textarea id="instruction" rows="5" placeholder="Например: замени скатерть на светлую мраморную поверхность, фон сделай современной кухней. Руки, продукты и посуду оставь без изменений."></textarea>
+      </div>
+      <div class="field">
+        <span class="field-label">Формат результата</span>
+        <div class="spec-grid">
+          <div><span>Кадр</span><strong>9:16</strong></div>
+          <div><span>Разрешение</span><strong>1080 × 1920</strong></div>
+          <div><span>Частота</span><strong>30 FPS</strong></div>
+          <div><span>Длительность</span><strong>1–3 минуты</strong></div>
+        </div>
+      </div>
+      <div class="notice">Оригинал должен оставаться неизменным. В рабочей версии на сервер будет отправляться отдельная копия.</div>
+      <button class="primary full" id="analyzeBtn">Продолжить к плану обработки</button>
+      <p class="tiny muted">В прототипе кнопка создаёт демонстрационный проект без загрузки файла в облако.</p>
+    </section>
+
+    <section id="planScreen" class="screen">
+      <button class="back" data-go="create">← Назад</button>
+      <p class="eyebrow">ЭТАП 1 · ПЛАН</p>
+      <h1>Проверь план ИИ</h1>
+      <p class="muted">В рабочей версии этот список будет сформирован после анализа загруженного видео.</p>
+      <div class="plan-card">
+        <div class="plan-row"><span>Руки</span><b class="keep">Сохранить</b></div>
+        <div class="plan-row"><span>Продукты</span><b class="keep">Сохранить</b></div>
+        <div class="plan-row"><span>Посуда</span><b class="keep">Сохранить</b></div>
+        <div class="plan-row"><span>Скатерть / стол</span><b class="change">Заменить</b></div>
+        <div class="plan-row"><span>Фон</span><b class="change">Заменить</b></div>
+      </div>
+      <div class="field"><label for="planNote">Уточнение к плану (необязательно)</label><textarea id="planNote" rows="3" placeholder="Напишите, что нужно изменить в плане..."></textarea></div>
+      <button class="primary full" id="approvePlanBtn">Подтвердить план</button>
+      <button class="secondary full" data-go="create">Вернуться к описанию</button>
+      <div class="notice warning">Демонстрационный план не является результатом компьютерного анализа видео.</div>
+    </section>
+
+    <section id="previewScreen" class="screen">
+      <button class="back" data-go="plan">← К плану</button>
+      <p class="eyebrow">ЭТАП 2 · ВНЕШНИЙ ВИД</p>
+      <h1>Согласование стиля</h1>
+      <p class="muted">Здесь будут показаны контрольные кадры с новым окружением до запуска полной обработки.</p>
+      <div class="preview-placeholder"><div class="preview-frame">КОНТРОЛЬНЫЙ КАДР<br><span>Появится после подключения сервера обработки</span></div></div>
+      <div class="field"><label for="styleNote">Что поправить?</label><textarea id="styleNote" rows="3" placeholder="Например: стол чуть темнее, фон оставить светлым..."></textarea></div>
+      <button class="primary full" id="approveStyleBtn">Подтвердить стиль и этап</button>
+      <button class="secondary full" id="requestStyleBtn">Отправить замечание</button>
+      <div class="notice warning">Полная обработка пока не запускается: сервер, модели и облачное хранилище ещё не подключены.</div>
+    </section>
+
+    <section id="statusScreen" class="screen">
+      <button class="back" data-go="home">← Мои видео</button>
+      <p class="eyebrow">ПРОЕКТ</p>
+      <h1 id="statusTitle">Проект создан</h1>
+      <div class="status-banner"><span class="pulse"></span><div><strong id="statusLabel">Ожидает подключения сервера</strong><p class="muted small">Это не означает, что видео уже обрабатывается.</p></div></div>
+      <div class="steps">
+        <div class="step done"><span>✓</span><div><strong>Проект создан</strong><small>Описание и параметры сохранены в этом браузере</small></div></div>
+        <div class="step pending"><span>2</span><div><strong>Анализ видео</strong><small>Требуется сервер и модели сегментации</small></div></div>
+        <div class="step pending"><span>3</span><div><strong>Контрольные кадры</strong><small>Требуется подключение ComfyUI / обработки изображений</small></div></div>
+        <div class="step pending"><span>4</span><div><strong>Полная обработка</strong><small>Запускается только после согласования</small></div></div>
+        <div class="step pending"><span>5</span><div><strong>Проверка и скачивание</strong><small>Готовый MP4 будет доступен после завершения</small></div></div>
+      </div>
+      <button class="secondary full" data-go="home">Вернуться к проектам</button>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-go="home"><span>⌂</span>Проекты</button>
+    <button class="nav-item" data-go="create"><span>＋</span>Новое видео</button>
+  </nav>
+  <script src="./app.js"></script>
+</body>
+</html>
