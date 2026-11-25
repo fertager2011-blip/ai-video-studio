@@ -60,14 +60,28 @@
         <label for="instruction">Описание изменений</label>
         <textarea id="instruction" rows="5" placeholder="Например: замени скатерть на светлую мраморную поверхность, фон сделай современной кухней. Руки, продукты и посуду оставь без изменений."></textarea>
       </div>
-      <div class="field">
-        <span class="field-label">Формат результата</span>
-        <div class="spec-grid">
-          <div><span>Кадр</span><strong>9:16</strong></div>
-          <div><span>Разрешение</span><strong>1080 × 1920</strong></div>
-          <div><span>Частота</span><strong>30 FPS</strong></div>
-          <div><span>Длительность</span><strong>1–3 минуты</strong></div>
-        </div>
+      <div class="field settings-field">
+        <span class="field-label">Параметры готового видео</span>
+        <label for="outputFormat">Формат кадра</label>
+        <select id="outputFormat">
+          <option value="9:16" selected>Вертикальный 9:16 — Reels / TikTok</option>
+          <option value="16:9">Горизонтальный 16:9 — YouTube</option>
+          <option value="1:1">Квадратный 1:1 — лента соцсетей</option>
+        </select>
+        <label for="outputResolution">Разрешение</label>
+        <select id="outputResolution">
+          <option value="720p">720p — меньше размер файла</option>
+          <option value="1080p" selected>1080p — рекомендуемое</option>
+          <option value="4K">4K — максимальная детализация</option>
+        </select>
+        <label for="outputFps">Частота кадров</label>
+        <select id="outputFps">
+          <option value="24">24 FPS — кинематографичный вид</option>
+          <option value="25">25 FPS</option>
+          <option value="30" selected>30 FPS — рекомендуемое</option>
+          <option value="60">60 FPS — более плавное движение</option>
+        </select>
+        <div class="notice">Длительность отдельно выбирать не нужно: приложение определит её по исходному ролику и сохранит полностью. Если понадобится обрезка, добавим отдельный инструмент монтажа.</div>
       </div>
       <div class="notice">Оригинал должен оставаться неизменным. В рабочей версии на сервер будет отправляться отдельная копия.</div>
       <button class="primary full" id="analyzeBtn">Продолжить к плану обработки</button>
