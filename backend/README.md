@@ -37,3 +37,7 @@ uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
 API documentation is available at `/docs` while the service is running.
+
+
+## Deployment scaffold
+See `DEPLOYMENT.md` for the prepared Docker Compose + Caddy HTTPS deployment steps. This scaffold is not deployed yet and does not enable AI processing.
