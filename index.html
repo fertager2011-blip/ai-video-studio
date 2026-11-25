@@ -7,7 +7,7 @@
   <meta name="description" content="AI Video Studio — управление обработкой кулинарных видео">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./styles.css?v=5">
+  <link rel="stylesheet" href="./styles.css?v=6">
   <title>AI Video Studio</title>
 </head>
 <body>
@@ -56,6 +56,7 @@
       </label>
       <input id="videoFile" type="file" accept="video/*" hidden>
       <video id="videoPreview" class="video-preview" controls playsinline preload="metadata" hidden></video>
+      <div id="fileInfo" class="file-info" hidden aria-live="polite"></div>
       <p id="durationInfo" class="muted small" aria-live="polite">Длительность появится после выбора видео.</p>
       <div class="field">
         <label for="instruction">Описание изменений</label>
@@ -139,6 +140,6 @@
     <button class="nav-item active" data-go="home"><span>⌂</span>Проекты</button>
     <button class="nav-item" data-go="create"><span>＋</span>Новое видео</button>
   </nav>
-  <script src="./app.js?v=5"></script>
+  <script src="./app.js?v=6"></script>
 </body>
 </html>
